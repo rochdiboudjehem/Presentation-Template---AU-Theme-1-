@@ -1,0 +1,206 @@
+\mode<presentation>
+
+% background ("light" option)
+\newcommand{\additionaltitlepage}{}
+\newcommand{\additionalsectionpage}
+{   %\draw[color=white] (0.35cm,0.50\paperheight) -- (11.5cm,0.50\paperheight);
+    \draw[color=white] (0.35cm,0.50\paperheight) -- ($(\paperwidth,0.5\paperheight)-(0.95cm,0cm)$);
+}
+\newcommand{\additionalhighlightpage}{}
+\DeclareOptionBeamer{light}
+{   \renewcommand{\additionaltitlepage}
+	{	\fill[color=white,opacity=0.75] (0.7cm,0) rectangle (\the\paperwidth,\the\paperheight);
+	}
+	\renewcommand{\additionalsectionpage}
+	{   \fill[color=white,opacity=0.75] (-0.50cm,0.30\paperheight) rectangle (\the\paperwidth,0.495\paperheight);
+	    \fill[color=white,opacity=0.75] (-0.50cm,0.505\paperheight) rectangle (\the\paperwidth,0.60\paperheight);
+	}
+	\renewcommand{\additionalhighlightpage}
+	{   \fill[color=white,opacity=0.75] (-0.50cm,0.40\paperheight) rectangle (\the\paperwidth,0.60\paperheight);
+	}
+}
+\ProcessOptionsBeamer
+
+% test if section page
+\newif\ifinsectionframe
+\insectionframefalse
+% macro to define section pages in the presentation
+\newcommand{\sectionframe}{
+    \insectionframetrue
+    \frame{\sectionpage}
+    \insectionframefalse
+}
+
+% test if highlight page
+\newif\ifinhighlightframe
+\inhighlightframefalse
+% macro to define highlight page
+\newcommand{\highlightframe}[1]{
+    \inhighlightframetrue
+    \renewcommand{\highlighttext}{#1}
+    \frame{\usebeamertemplate*{highlight page}}
+    \inhighlightframefalse
+}
+
+% background
+\setbeamertemplate{background}{
+    % plain frames
+    \ifbeamer@plainframe%
+    {   % no background 
+    }
+    \else
+    {   % non-title frames
+        \ifnum\thepage>1\relax%
+        {   % section frames
+            \ifinsectionframe%
+            {   \begin{tikzpicture}[remember picture]
+                    \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+                    \node[anchor=north west, inner sep=-0.01cm] at (current page.north west){%
+                        \ifaspectratio{169}
+                            {\includegraphics{au/backgrounds/section_16-9.pdf}}
+                            {\includegraphics{au/backgrounds/section_4-3.pdf}}};
+                    \additionalsectionpage{}
+                    \node[anchor=south east, inner sep=0.0cm] at (current page.south east){%
+                        \ifaspectratio{169}
+                            {\includegraphics[width=2cm]{au/backgrounds/au_w_logo.pdf}}
+                            {\includegraphics[width=2cm]{au/backgrounds/au_w_logo.pdf}}};
+                \end{tikzpicture}
+            }
+            \else%
+            {   % highlight frames
+                \ifinhighlightframe%
+                {   \begin{tikzpicture}[remember picture]
+                        \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+                        \node[anchor=north west, inner sep=-0.01cm] at (current page.north west){%
+                            \ifaspectratio{169}
+                                {\includegraphics{au/backgrounds/section_16-9.pdf}}
+                                {\includegraphics{au/backgrounds/section_4-3.pdf}}};
+                        \additionalhighlightpage{}
+                        \node[anchor=south east, inner sep=0.0cm] at (current page.south east){%
+                            \ifaspectratio{169}
+                                {\includegraphics[width=2cm]{au/backgrounds/au_w_logo.pdf}}
+                                {\includegraphics[width=2cm]{au/backgrounds/au_w_logo.pdf}}};
+                    \end{tikzpicture}
+                }
+                \else%
+                {   % regular frames
+                    \begin{tikzpicture}[remember picture,overlay]
+                        \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+                        \node[anchor=north west, inner sep=-0.01cm] at (current page.north west){%
+                            \ifaspectratio{169}
+                                {\includegraphics{au/backgrounds/regular_16-9.pdf}}
+                                {\includegraphics{au/backgrounds/regular_4-3.pdf}}};
+                    \end{tikzpicture}
+                }
+                \fi%
+            }
+            \fi%
+        }
+        % title frame
+        \else
+        {   \begin{tikzpicture}[remember picture]
+                \useasboundingbox (0,0) rectangle(\the\paperwidth,\the\paperheight);
+                \node[anchor=north west, inner sep=-0.01cm] at (current page.north west){%
+                    \ifaspectratio{169}
+                        {\includegraphics{au/backgrounds/title_16-9.pdf}}
+                        {\includegraphics{au/backgrounds/title_4-3.pdf}}};
+                \additionaltitlepage{}
+                \node[anchor=south east, inner sep=0.0cm] at (current page.south east){%
+                    \ifaspectratio{169}
+                        {\includegraphics[width=2.5cm]{au/backgrounds/au_col_logo.pdf}}
+                        {\includegraphics[width=3cm]{au/backgrounds/au_col_logo.pdf}}};
+            \end{tikzpicture}
+        }
+        \fi%
+    }
+    \fi%
+}
+
+% title page
+\newlength{\myboxwidth}
+\defbeamertemplate*{title page}{AU}[1][]
+{   % additional logo in the upper right corner
+    \begin{tikzpicture}[remember picture,overlay]
+        \node[anchor=north east, inner sep=0.25cm] at (current page.north east){%
+        \inserttitlegraphic};
+    \end{tikzpicture}
+
+    \ifaspectratio{169}
+        {\setlength{\myboxwidth}{11cm}}
+        {\setlength{\myboxwidth}{9cm}}
+
+    % main title of the presentation
+%\colorbox{yellow}{
+    \begin{beamercolorbox}[wd=\myboxwidth,left,#1]{title page header}
+      \usebeamerfont{title}\inserttitle\par%
+    \end{beamercolorbox}%
+%}%
+    % subtitle of the presentation
+    \ifx\insertsubtitle\@empty
+    {}
+    \else
+    {   \vskip0.25cm%
+        \begin{beamercolorbox}[wd=\myboxwidth,left,#1]{subtitle page header}
+            \usebeamerfont{subtitle}\insertsubtitle\par%
+        \end{beamercolorbox}%
+    }
+    \fi
+
+    % authors' names
+    \vskip0.75cm%
+    \begin{beamercolorbox}[wd=\myboxwidth,left,#1]{author}
+      \usebeamerfont{author}\insertauthor%
+    \end{beamercolorbox}
+    
+    % affiliations
+    \ifx\insertinstitute\@empty
+    {}
+    \else
+    {   \vskip0.25cm%
+        \begin{beamercolorbox}[wd=\myboxwidth,left,#1]{institute}
+            \usebeamerfont{institute}\insertinstitute%
+        \end{beamercolorbox}
+    }
+    \fi    
+    
+    % date
+    \vskip0.25cm%
+    \ifx\insertdate\@empty
+       \date{\today}
+    \fi
+    \begin{beamercolorbox}[wd=\myboxwidth,left,#1]{date}
+        \usebeamerfont{author}\insertdate%
+    \end{beamercolorbox}
+  \vfill
+}
+
+% lists
+%\setbeamertemplate{items}[circle]
+\setbeamertemplate{itemize items}{\normalsize$\bullet$} 
+\setbeamertemplate{enumerate items}[circle] 
+\setbeamertemplate{sections/subsections in toc}[circle]
+
+% blocks
+\setbeamertemplate{blocks}[rounded=false,shadow=false] 
+
+% captions
+\setbeamertemplate{caption}[numbered]
+
+% disables the nav bar
+\setbeamertemplate{navigation symbols}{}
+
+% footnotes (move them above the footline)
+\ifaspectratio{169}
+    {\addtobeamertemplate{footnote}{\vspace{-6pt}\advance\hsize-0.5cm}{\vspace{8pt}}
+        \renewcommand*{\footnoterule}{\kern -3pt \hrule \@width 2in \kern 8.6pt}}
+    {\addtobeamertemplate{footnote}{\vspace{-6pt}\advance\hsize-0.5cm}{\vspace{6pt}}
+        \renewcommand*{\footnoterule}{\kern -3pt \hrule \@width 2in \kern 8.6pt}}
+
+% theorems
+\setbeamertemplate{theorems}[numbered]
+
+% bibliography
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+\mode
+<all>

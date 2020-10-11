@@ -1,0 +1,459 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Presentation template and short Beamer example/tutorial.
+%% v2.6.3 - 02/11/2019
+%%
+%% Disclaimer: The internal coding of this theme is ugly. I do 
+%% not recommend using it as a basis for developing your own theme!
+%%
+%% Vincent Labatut 2017-19 <vincent.labatut@univ-avignon.fr>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\mode<presentation>
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% import various packages
+%\RequirePackage[utf8x]{inputenc}       % useless when compiling with LuaLaTeX
+\RequirePackage{babel}		            % language package
+\RequirePackage{tikz}                   % diagram package
+\RequirePackage{verbatim}               % mention latex source code
+\RequirePackage{appendixnumberbeamer}   % don't count appendix slides
+\RequirePackage{csvsimple}				% populates table with file content
+\RequirePackage{soul}					% improves hyphenation
+%\RequirePackage{footmisc}              % additional footnote features >> conflicts with beamer footnotes
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% misc custom commands
+\newcommand{\tpc}{\textperiodcentered}  % middle dot command
+\RequirePackage{pifont}                 % dingbat characters
+\newcommand{\cmark}{\ding{51}}          % command for check mark
+\newcommand{\xmark}{\ding{55}}          % command for matching cross mark
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% define custom colors
+\definecolor{fgRed}{RGB}{241,92,78}
+\definecolor{fgDarkRed}{RGB}{91,27,22}
+\definecolor{fgLightRed}{RGB}{241,167,159}
+\definecolor{fgVeryLightRed}{RGB}{248,226,224}
+\definecolor{fgYellow}{RGB}{250,165,25}
+\definecolor{fgDeepRed}{RGB}{238,42,36}
+\definecolor{fgLightYellow}{RGB}{229,208,66}
+\definecolor{bgLightGray}{RGB}{235,235,235}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom tables
+\RequirePackage{multirow}				% allows table cells to span several rows
+\renewcommand<>\cellcolor[1]{\only#2    % overlays with cell color
+    {\beameroriginal\cellcolor{#1}}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom equations
+\makeatletter                           % color of equation numbers
+\def\tagform@#1{\maketag@@@{(\textcolor{fgRed}{#1})\@@italiccorr}}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibliographic settings
+\RequirePackage{doi}					% displays DOIs in the bibliography
+\RequirePackage[autostyle]{csquotes}	% don't remember why I put this
+\RequirePackage[
+    sorting=nty,                        % sorted by name, title, year
+	maxcitenames=2,						% one author max in the text
+	maxbibnames=99,						% list all authors in the reference list
+%	style=numeric,						% numeric style for reference list
+%	citestyle=numeric-comp,				% numeric style for citations
+	style=alphabetic,					% NOTE: if you want the author-year style instead,
+	citestyle=alphabetic,			    % uncomment these 2 lines and comment both ones above
+    datamodel=au/sty/hal_id,            % prints custom hal-id fields
+    backend=biber]		            	% uses biber to compile (instead of bibtex)
+{biblatex}							    % uses BibLaTeX (instead of BibTeX)
+% use the same number of names in \fullcite and \footfullcite as in the bibliographic section
+% source retrieved from https://tex.stackexchange.com/a/126245/31360
+\makeatletter
+\DeclareCiteCommand{\fullcite}
+  {\defcounter{maxnames}{\blx@maxbibnames}%
+    \usebibmacro{prenote}}
+  {\usedriver
+     {\DeclareNameAlias{sortname}{default}}
+     {\thefield{entrytype}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+\DeclareCiteCommand{\footfullcite}[\mkbibfootnote]
+  {\defcounter{maxnames}{\blx@maxbibnames}%
+    \usebibmacro{prenote}}
+  {\usedriver
+     {\DeclareNameAlias{sortname}{default}}
+     {\thefield{entrytype}}}
+  {\multicitedelim}
+  {\usebibmacro{postnote}}
+\makeatother
+% specific commands for HAL ids
+% based on https://tex.stackexchange.com/a/452629/31360
+\DeclareFieldFormat{hal}{%
+    \ifhyperref
+    {$\langle$\href{https://hal.archives-ouvertes.fr/#1}{\nolinkurl{#1}}$\rangle$}
+    {$\langle$\nolinkurl{#1}$rlangle$}
+}
+\DeclareFieldAlias{eprint:hal}{hal}
+\DeclareFieldAlias{eprint:HAL}{eprint:hal}
+\renewbibmacro*{eprint}{%
+    \printfield{hal}%
+    \newunit\newblock
+    \iffieldundef{eprinttype}
+    {\printfield{eprint}}
+    {\printfield[eprint:\strfield{eprinttype}]{eprint}}
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% vertical rule to separate subfigures
+\newcommand{\rulesep}{\unskip\ \vrule\ }
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom algorithms
+\RequirePackage[                    % environment for pseudo code
+%   french,                         % language in the caption (default: English) (>> now passed directly through documentclass options)
+    ruled,                          % boxed, ruled (shaded in v5.3)
+    linesnumbered,                  % add line numbers
+    longend,                        % block-specific end keyword
+    procnumbered                    % functions/procedures must be numbered
+]{au/sty/algorithm2e}               % Overleaf does not have the latest version installed
+\SetAlCapFnt{\color{fgRed}}	        % change caption font (in algorithm floats)
+\SetProcFnt{\color{fgRed}}			% change caption font (in function/procedure floats)
+\SetAlCapSty{}                      % remove bold from the caption
+\SetNlSty{}{}{}                     % remove bold from line numbers
+% keep the caption below 
+% (see https://tex.stackexchange.com/questions/27671/algorithm2e-with-ruled-but-with-caption-underneath)
+% and also shaded background
+% (see https://tex.stackexchange.com/questions/375669/apply-background-color-in-algorithm2e-but-not-on-the-caption)
+\makeatletter                       
+\newenvironment{algorithm2e}[1][htpb]
+{   \def\@algocf@pre@ruled{%
+        \setlength{\OuterFrameSep}{0pt}
+	    \setlength{\FrameSep}{1mm}
+	    \colorlet{shadecolor}{bgLightGray}
+        \begin{shaded}}%
+    \def\@algocf@post@ruled{\end{shaded}\relax}%    % without horizontal separator
+%    \def\@algocf@post@ruled{\end{shaded}\kern\interspacealgoruled\hrule  height\algoheightrule\kern3pt\relax}%           % with horizontal separator
+    \def\@algocf@capt@ruled{under}%
+    \begin{algorithm}[#1]}
+  {\end{algorithm}}
+\makeatother
+\setlength\algotitleheightrule{0pt} % remove the last rule (below the caption)
+\SetAlgoCaptionLayout{centerline}   % center the caption
+%\SetAlgoCaptionSeparator{--}	    % change the caption separator character (note: moved that to the options part, so that it applies only to French)
+\resetcounteronoverlays{algocf}     % prevent algo number increment on overlays 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% custom listings
+\RequirePackage{listings}					    % format source code
+% \RequirePackage{lstlinebgrd}				    % change background color - Does not work anymore (v2.6.3)
+\definecolor{colKeywords}{RGB}{127,0,85}	    % keyword color
+\definecolor{colComments}{RGB}{77,109,141}		% comment color
+\definecolor{colStrings}{RGB}{42,0,255}	        % string literal color
+\definecolor{colLstHL}{RGB}{255,255,153}	    % highlight color
+\definecolor{colNumber}{rgb}{0.50,0.50,0.50}	% line number color
+\lstset{
+%   frame=tb,                                   % frame around the source code
+	aboveskip=3mm,                              % space before the source code
+	belowskip=3mm,                              % space after the source code
+	showstringspaces=false,                     % display space char as underscore
+	columns=flexible,
+    captionpos=b,                               % position of the caption (t or b)
+	basicstyle={\small\ttfamily},               % only for French: should add \NoAutoSpacing ... but works fine without it, apparently.
+	keywordstyle=\color{colKeywords},           % set keyword color
+	commentstyle=\color{colComments},           % set comment color
+	stringstyle=\color{colStrings},             % set string literal color
+    backgroundcolor=\color{bgLightGray},        % set background color
+	numbers=left,	                            % line numbering: left, none
+	numberstyle=\tiny\color{colNumber},         % line number format
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3,                                  % size of tabulation (in chars)
+	upquote=true,                               % straight quote character (' instead of ’)
+    literate=%
+		{à}{{\`a}}1
+        {À}{{\`A}}1
+        {á}{{\'a}}1
+        {Á}{{\'A}}1
+		{â}{{\^a}}1
+        {Â}{{\^A}}1
+        {ä}{{\"a}}1
+        {Ä}{{\"A}}1
+        {å}{{\r a}}1
+        {Å}{{\r A}}1
+        {æ}{{\ae}}1
+        {Æ}{{\AE}}1
+		{ç}{{\c{c}}}1
+        {Ç}{{\c{C}}}1
+		{é}{{\'e}}1
+        {É}{{\'E}}1
+		{è}{{\`e}}1
+        {È}{{\`E}}1
+		{ë}{{\"e}}1
+        {Ë}{{\"E}}1
+		{ê}{{\^e}}1
+        {Ê}{{\^E}}1
+        {í}{{\'i}}1
+        {Í}{{\'I}}1
+        {ì}{{\`i}}1
+        {Ì}{{\`I}}1
+		{ï}{{\"i}}1
+        {Ï}{{\"I}}1
+		{î}{{\^i}}1
+        {Î}{{\^I}}1
+        {ñ}{{\~n}}1
+        {Ñ}{{\~N}}1
+        {ó}{{\'o}}1
+        {Ó}{{\'O}}1
+        {ò}{{\`o}}1
+        {Ò}{{\`O}}1
+		{ö}{{\"o}}1
+        {Ö}{{\"O}}1
+		{ô}{{\^o}}1
+        {Ö}{{\^O}}1
+        {ő}{{\H{o}}}1
+        {Ő}{{\H{O}}}1
+        {ø}{{\o}}1
+        {œ}{{\oe}}1
+        {Œ}{{\OE}}1
+        {ß}{{\ss}}1
+        {ú}{{\'u}}1
+        {Ú}{{\'U}}1
+		{ù}{{\`u}}1
+        {Ù}{{\`U}}1
+		{ü}{{\"u}}1
+        {Ü}{{\"U}}1
+		{û}{{\^u}}1
+        {Û}{{\^U}}1
+        {ű}{{\H{u}}}1
+        {Ű}{{\H{U}}}1
+        {€}{{\euro}}1 
+        {£}{{\pounds}}1 
+        {«}{{\guillemotleft}}1
+        {»}{{\guillemotright}}1 
+        {¿}{{?`}}1
+}
+% this is just to be able to mention the listings environments... in LaTeX listings environments (to give LaTeX code source as examples)
+\lstnewenvironment{TeXlstlisting}{\lstset{language=[LaTeX]TeX,numbers=none}}{}
+\resetcounteronoverlays{lstlisting}     % prevent listing number increment on overlays 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% additional TikZ sub-librairies
+\usetikzlibrary{arrows}					    % configures arrow tips
+\usetikzlibrary{arrows.meta}				% necessary to draw graphs
+  \tikzset{>=latex}						    % uses larger default arrow tips
+\usetikzlibrary{calc}						% extended coordinate calculation
+\usetikzlibrary{decorations.markings}		% improved decorations
+\usetikzlibrary{decorations.pathreplacing}	% improved decorations
+\usetikzlibrary{math}						% use mathematical functions
+\usetikzlibrary{positioning} 				% ease relative positioning
+%\usetikzlibrary{backgrounds} 				% ?
+%\usetikzlibrary{mindmap} 				    % ?
+%\usetikzlibrary{babel} 				    % ?
+% animations in TikZ figures
+% http://tex.stackexchange.com/questions/136143/tikz-animated-figure-in-beamer
+\tikzset{
+  invisible/.style={opacity=0},
+  visible on/.style={alt={#1{}{invisible}}},
+  alt/.code args={<#1>#2#3}{%
+    \alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+  },
+}
+% for graphs (networks)
+\RequirePackage{au/sty/tikz-network}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% handle hyperref warnings
+\makeatletter
+\pdfstringdefDisableCommands{%
+  \def\\{}%
+  \def\hbox{}%
+  \def\mathsurround{}%
+  \def\z@{0}%
+  \def\@@underline{}%
+  \def\textsuperscript#1{}%
+  \def\texttt#1{<#1>}%
+}
+\makeatother
+% check this: https://tex.stackexchange.com/questions/306988/automatically-add-texorpdfstring-for-math-mode-in-section-titles
+% sets template version
+\hypersetup{
+    pdfkeywords={mod\`ele de pr\'esentation v2.6.3},
+    pdfencoding=auto            % avoid encoding problems in PDF bookmarks (French)
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% caption settings (start)
+\RequirePackage{caption}				% caption customisation
+\newcommand{\mysep}{colon}              % default label separator (might be redefined for French)
+% \DeclareCaptionType{fileText}           % captions for file text floats
+%     [File][List of text files]
+% \DeclareCaptionType{consoleText}        % captions for console floats
+%     [Console][List of console outputs]
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% aspect ratio related macro
+% taken from https://tex.stackexchange.com/a/123144/31360
+\RequirePackage{xparse}
+\ExplSyntaxOn
+\NewDocumentCommand{\ifaspectratio}{mmm}
+ {
+  % Recover the option from those passed to the class
+  \keys_set:nf { zunbeltz/beameroptions } { \use:c { opt@beamer.cls } }
+  \str_if_eq:nVTF { #1 } \l_zunbeltz_aspectratio_tl { #2 } { #3 }
+ }
+\NewDocumentCommand{\xifaspectratio}{mO{}}
+ {
+  % Recover the option from those passed to the class
+  \keys_set:nf { zunbeltz/beameroptions } { \use:c { opt@beamer.cls } }
+  \str_case:Vnn \l_zunbeltz_aspectratio_tl { #1 } { #2 }
+ }
+% We need to define only one key, the other are treated as `unknown'
+\keys_define:nn { zunbeltz/beameroptions }
+ {
+  aspectratio .tl_set:N = \l_zunbeltz_aspectratio_tl,
+  aspectratio .initial:n = 43,
+  unknown .code:n = {},
+ }
+
+% Generate the variants we need
+\cs_generate_variant:Nn \keys_set:nn { nf }
+\cs_generate_variant:Nn \str_if_eq:nnTF { nV }
+\cs_generate_variant:Nn \str_case:nnF { V }
+\ExplSyntaxOff
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% deals with a bug when using the 2nd screen option
+% (white on white text in description lists and some other specific situations)
+\makeatletter 
+\def\beamer@framenotesbegin{% at beginning of slide
+    \usebeamercolor[fg]{normal text}
+    \gdef\beamer@noteitems{}% 
+    \gdef\beamer@notes{}% 
+}
+\makeatother
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% handle the rest of the options
+\DeclareOptionBeamer{light}                     % sets different title and section pages
+{   \PassOptionsToPackage{light}{au/sty/beamerinnerthemeAU}
+    \PassOptionsToPackage{light}{au/sty/beamercolorthemeAU}
+}
+\DeclareOptionBeamer{french}                    % only for French
+{   % package algorithm
+    \SetAlgoCaptionSeparator{--}                % change the caption separator character
+    % package listings
+    \renewcommand{\mysep}{myendash}
+%    \captionsetup{labelsep=myendash}            % separator between label and text
+    \newcommand{\frenchactive}{true}
+}
+\DeclareOptionBeamer{handout}                   % console text in inversed colors
+{   \newcommand{\handoutactive}{true}
+    % TODO: do that for all options, deal with them in the appropriate order (without before/after settings)
+}
+\ProcessOptionsBeamer
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% caption settings (end)
+\DeclareCaptionLabelSeparator{myendash}{ \textcolor{fgRed!50}{\space\textendash\space}}
+\captionsetup{
+	labelfont={color=fgRed, small},	    % font(sf), color, bold, size of the caption label
+	textfont={small},					% font(sf) and size of the caption text itself
+	labelsep=\mysep,					% separator between label and text
+%	margin=10mm							% left/right margins
+    skip=0.4cm                          % space between object and caption
+}
+\ifundef{\frenchactive}
+{   \DeclareCaptionType{fileText}           % captions for file text floats
+        [File][List of text files]
+    \DeclareCaptionType{consoleText}
+        [Console][Liste of console outputs] % captions for console floats
+}
+{   \DeclareCaptionType{fileText}           % captions for file text floats
+        [Fichier][Liste de fichiers]
+    \DeclareCaptionType{consoleText}
+        [Console][Liste de sorties console] % captions for console floats
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% typewriter-type environments
+\RequirePackage{framed}
+\pgfkeys{
+ /filetext/.is family, /filetext,
+ caption/.estore in = \filetextCaption,
+ label/.estore in = \filetextLabel,
+}
+% file text environment
+\makeatletter
+\newenvironment{filetext}[1][]
+{	\def\tmp{#1}%
+    \pgfkeys{/filetext,#1}
+    \setlength{\OuterFrameSep}{0pt}						% no frame around the text
+	\setlength{\FrameSep}{1mm}							% just a bit of colored space around the text
+    \colorlet{shadecolor}{fgVeryLightRed}               % background color to display files
+	\begin{shaded}\begin{raggedright}\captionsetup{type=fileText}\small\ttfamily}
+{\end{raggedright}\end{shaded}\par%
+%\ifx\tmp\@nnil{\relax}\else{\vspace{-0.25cm}\captionof{fileText}{\filetextCaption}\vspace{0.25cm}\label{\filetextLabel}}\fi
+\ifthenelse{\equal{\tmp}{}}{}{\vspace{-0.25cm}\captionof{fileText}{\filetextCaption}\vspace{0.25cm}\label{\filetextLabel}}
+    
+}
+\makeatother
+\resetcounteronoverlays{fileText}                       % prevent filetext number increment on overlays 
+\pgfkeys{
+ /consoletext/.is family, /consoletext,
+ caption/.estore in = \consoletextCaption,
+ label/.estore in = \consoletextLabel,
+}
+% console environment
+\makeatletter
+\newenvironment{consoletext}[1][]
+{	\def\tmp{#1}%
+    \pgfkeys{/consoletext,#1}
+    \setlength{\OuterFrameSep}{0pt}						% no frame around the text
+	\setlength{\FrameSep}{1mm}							% just a bit of colored space around the text
+	\ifundef{\handoutactive}                            % background color to display console
+    {   \colorlet{shadecolor}{fgDarkRed}
+        \colorlet{txtcolor}{fgVeryLightRed}
+    }
+    {   \colorlet{shadecolor}{fgVeryLightRed}
+        \colorlet{txtcolor}{fgDarkRed}
+    }
+	\begin{shaded}\begin{raggedright}\captionsetup{type=consoleText}\small\ttfamily\color{txtcolor}}
+{\end{raggedright}\end{shaded}\par%
+%\ifx\tmp\@nnil{\relax}\else{\vspace{-0.25cm}\captionof{consoleText}{\consoletextCaption}\vspace{0.25cm}\label{\consoletextLabel}}\fi
+\ifthenelse{\equal{\tmp}{}}{}{\vspace{-0.25cm}\captionof{consoleText}{\consoletextCaption}\vspace{0.25cm}\label{\consoletextLabel}}
+}
+\makeatother
+\resetcounteronoverlays{consoleText}                    % prevent consoletext number increment on overlays 
+\RequirePackage{textcomp}                               % for the \textquotesingle command (straight single quotes in \texttt)
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% settings
+%\useinnertheme{AU}
+%\useoutertheme{AU}
+%\usecolortheme{AU}
+%\usefonttheme{AU}
+\RequirePackage{au/sty/beamerinnerthemeAU}
+\RequirePackage{au/sty/beamerouterthemeAU}
+\RequirePackage{au/sty/beamercolorthemeAU}
+\RequirePackage{au/sty/beamerfontthemeAU}
+
+
+
+\mode<all>

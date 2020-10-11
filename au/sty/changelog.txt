@@ -1,0 +1,43 @@
+Changelog:
+v2.6.4 - ../../20.. : ...
+v2.6.3  - 02/11/2019 : imported a few tikz libraries, imported tikz-network, cellcolor overlays, disabled lstlinebgrd
+v2.6.2  - 29/08/2019 : added the removed footmisc package for footnotes, added BibLaTeX hal-id formatting, completed content
+v2.6.1  - 06/06/2019 : corrected handout+console bug, 2nd screen white-on-white bug, small content corrections
+v2.6    - 20/04/2019 : completed content, now supporting 16:9 aspect ratio
+v2.5.2  - 13/03/2019 : corrected bug in the French title page style, updated some logos
+v2.5.1  - 05/03/2019 : completed content, fixed float numbering problem with overlays, added console and text file titles
+v2.5    - 24/02/2019 : added \fauxsc for fake small caps
+v2.4.1  - 02/02/2019 : corrected bugs related to: title page affiliations, bibliographic citations, footer
+v2.4    -    01/2019 : commands for check/cross; fixed minor PDF bug
+v2.3.1  -    01/2019 : fixed bug preventing to display captions for listing 
+v2.3    -    01/2019 : added middle dot in the French slides
+v2.2    -    01/2019 : video-invert console in handout mode
+v2.1.3  -    01/2019 : listing-related adjustments 
+v2.1.2  -    01/2019 : algorithms-related adjustments 
+v2.1.1  -    01/2019 : corrected an error in the lstlistings example
+v2.1    -    12/2018 : corrected a few minor bugs, refactored files and folders
+v2      -    12/2018 : adaptation of the new official AU model, from scratch
+v1.3    -    11/2018
+v1.2    -    03/2018
+v1.1    -    10/2017
+v1      -    07/2017 : modification of the Metropolis theme
+
+To do:
+- In the title page, affiliation numbers are displayed using a serif font (but not regular superscripts).
+- The title page is not very appropriate for class slides
+  >> develop a proper version with appropriate macros for class name, major, and so on
+- Integrate the macros developped for specific classes (IR1 & 2) :
+  - Formatting for example text (words and expressions searched in an index),
+  - Relative character size,
+  - pgfplots,
+  - Shadow added behind images,
+  - Trim images (cf. MGN Kibana)
+  - Coordinates inside image (to add text or shapes)
+  - Change size of listing (add basicstyle={\tiny\ttfamily} in options)
+  - ...
+- Content:
+  - Actually use the resize trick for wide tables (see RI class slides)
+  - Problem with hyperlinks on image when compiling with XeLaTeX
+- Font:
+  - Could use Abadi font (cf. AU Doctoriales PDF)
+
